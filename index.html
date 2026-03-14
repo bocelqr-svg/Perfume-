@@ -1,52 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>R7 AROMA</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
+
 body{
-background:black;
+background:#050505;
 color:white;
-font-family:Arial;
+font-family:sans-serif;
 }
 
 .card{
-background:#0a0a0a;
-border:1px solid #10b981;
+background:#0f0f0f;
 border-radius:20px;
-padding:20px;
-text-align:center;
+overflow:hidden;
+transition:.3s;
 }
 
-.btn{
-background:#10b981;
-color:black;
-padding:10px;
-border-radius:10px;
-font-weight:bold;
-width:100%;
+.card:hover{
+transform:scale(1.03);
 }
 
 </style>
+
 </head>
 
 <body class="p-6">
 
-<h1 class="text-3xl font-bold text-center mb-10 text-emerald-500">
+<h1 class="text-4xl font-bold text-center text-emerald-500 mb-10">
 R7 AROMA
 </h1>
 
 <div class="text-center mb-10">
-<button onclick="admin()" class="btn">
+<button onclick="abrirAdmin()" class="bg-emerald-500 text-black px-6 py-3 rounded-xl font-bold">
 Panel Admin
 </button>
 </div>
 
-<div id="grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+<div id="productos" class="grid md:grid-cols-3 gap-10"></div>
+
 
 <script type="module">
 
@@ -54,6 +53,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyBDkzh65Jf5vgNBSD39",
 authDomain: "r7-aroma-60f9d.firebaseapp.com",
 databaseURL: "https://r7-aroma-60f9d-default-rtdb.firebaseio.com",
@@ -61,107 +61,119 @@ projectId: "r7-aroma-60f9d",
 storageBucket: "r7-aroma-60f9d.appspot.com",
 messagingSenderId: "487567321349",
 appId: "1:487567321349:web:9d405cc39af8"
+
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let productos=[];
+let perfumes=[];
 
 function render(){
 
-const grid=document.getElementById("grid");
+const cont=document.getElementById("productos");
 
-grid.innerHTML="";
+cont.innerHTML="";
 
-productos.forEach(p=>{
+perfumes.forEach(p=>{
 
-grid.innerHTML+=`
+cont.innerHTML+=`
 
-<div class="card">
+<div class="card shadow-lg">
 
-<img src="${p.image}" style="height:200px;margin:auto">
+<img src="${p.imagen}" class="w-full h-72 object-contain bg-black p-6">
 
-<h2 class="text-xl mt-4">${p.name}</h2>
+<div class="p-6">
 
-<p class="text-emerald-400 text-2xl">$${p.price}</p>
+<h2 class="text-xl font-bold">${p.nombre}</h2>
 
-<button onclick="comprar('${p.name}','${p.price}')" class="btn mt-4">
+<p class="text-emerald-400 text-2xl mt-2">$${p.precio}</p>
+
+<button onclick="comprar('${p.nombre}','${p.precio}')" 
+class="bg-emerald-500 text-black w-full mt-4 py-3 rounded-xl font-bold">
+
 Comprar
+
 </button>
 
-<button onclick="borrar('${p.id}')" class="btn mt-2 bg-red-500">
+<button onclick="eliminar('${p.id}')" 
+class="bg-red-500 w-full mt-2 py-2 rounded-xl">
+
 Eliminar
+
 </button>
+
+</div>
 
 </div>
 
 `;
 
-})
+});
 
 }
 
-onValue(ref(db,"perfumes"),snapshot=>{
+onValue(ref(db,"perfumes"),snap=>{
 
-productos=[];
+perfumes=[];
 
-snapshot.forEach(child=>{
+snap.forEach(child=>{
 
-productos.push({
+perfumes.push({
 id:child.key,
 ...child.val()
-})
+});
 
-})
+});
 
-render()
+render();
 
-})
+});
 
-window.admin=function(){
+window.abrirAdmin=function(){
 
-let pass=prompt("Clave admin")
+let pass=prompt("Clave admin");
 
 if(pass!="203031"){
-alert("Clave incorrecta")
-return
+alert("Clave incorrecta");
+return;
 }
 
-let name=prompt("Nombre perfume")
-let price=prompt("Precio")
-let image=prompt("URL imagen")
+let nombre=prompt("Nombre del perfume");
+let precio=prompt("Precio");
+let imagen=prompt("Pega URL de la imagen");
 
 push(ref(db,"perfumes"),{
-name,
-price,
-image
-})
+nombre,
+precio,
+imagen
+});
 
 }
 
-window.borrar=function(id){
+window.eliminar=function(id){
 
-let pass=prompt("Clave admin")
+let pass=prompt("Clave admin");
 
 if(pass!="203031"){
-alert("Clave incorrecta")
-return
+alert("Clave incorrecta");
+return;
 }
 
-remove(ref(db,"perfumes/"+id))
+remove(ref(db,"perfumes/"+id));
 
 }
 
-window.comprar=function(name,price){
+window.comprar=function(nombre,precio){
 
-let msg=`Hola quiero comprar ${name} precio $${price}`
+let msg=`Hola quiero comprar ${nombre} precio $${precio}`;
 
-window.open(`https://wa.me/18294379911?text=${encodeURIComponent(msg)}`)
+window.open(`https://wa.me/18294379911?text=${encodeURIComponent(msg)}`);
 
 }
 
 </script>
 
 </body>
+
 </html>
